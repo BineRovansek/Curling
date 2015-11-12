@@ -1,0 +1,275 @@
+<!doctype html>
+<html>
+<head>
+   <meta charset="utf-8">
+   <title>Babylon - Basic scene</title>
+   <style>
+      html, body {
+         overflow: hidden;
+         width: 100%;
+         height: 100%;
+         margin: 0;
+         padding: 0;
+      }
+      #renderCanvas {
+         width: 100%;
+         height: 100%;
+         touch-action: none;
+      }
+   </style>
+   <script src="./Babylon.js-master/dist/babylon.2.2.js"></script>
+   <script src="hand.js"></script> 
+   <script src="./Babylon.js-master/dist/Oimo.js"></script>
+</head>
+<body>
+   <canvas id="renderCanvas"></canvas>
+   <script type="text/javascript">
+      // Get the canvas element from our HTML below
+      var canvas = document.querySelector("#renderCanvas");
+      // Load the BABYLON 3D engine
+      var engine = new BABYLON.Engine(canvas, true);
+	  
+      // -------------------------------------------------------------
+      // Here begins a function that we will 'call' just after it's built
+      var createScene = function () {
+         // Now create a basic Babylon Scene object
+        var scene = new BABYLON.Scene(engine);
+		
+		//Set gravity for the scene (G force like, on Y-axis) and enable physics
+		scene.enablePhysics(new BABYLON.Vector3(0, -20, 0), new BABYLON.OimoJSPlugin());
+         // Change the scene background
+        scene.clearColor = new BABYLON.Color3(0.2, 0.2, 0.7);
+        // This creates and positions a free camera
+        var camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(110, 60, 0), scene);
+        // This targets the camera to scene origin
+        camera.setTarget(BABYLON.Vector3.Zero());
+         // This attaches the camera to the canvas
+        camera.attachControl(canvas, false);
+		
+		
+		 // Let's try our built-in 'sphere' shape. Params: name, subdivisions, size, scene
+         var sphere = BABYLON.Mesh.CreateSphere("sphere", 16, 5, scene);
+		 
+		 sphere.position.y = 10;
+		 sphere.position.x = 50;
+		 
+		 var sphere1 = BABYLON.Mesh.CreateSphere("sphere", 16, 5, scene);
+		 var sphere2 = BABYLON.Mesh.CreateSphere("sphere", 16, 5, scene);
+		 var sphere3 = BABYLON.Mesh.CreateSphere("sphere", 16, 5, scene);
+		 var sphere4 = BABYLON.Mesh.CreateSphere("sphere", 16, 5, scene);
+		 var sphere5 = BABYLON.Mesh.CreateSphere("sphere", 16, 5, scene);
+		 var sphere6 = BABYLON.Mesh.CreateSphere("sphere", 16, 5, scene);
+		 
+		 sphere1.position.y = 10;
+		 sphere1.position.x = -30;
+		 
+		 sphere2.position.y = 10;
+		 sphere2.position.x = -40;
+		 sphere2.position.z = -5;
+		 
+		 sphere3.position.y = 10;
+		 sphere3.position.x = -40;
+		 sphere3.position.z = 5;
+		 
+		 sphere4.position.y = 10;
+		 sphere4.position.x = -50;
+		 sphere4.position.z = -10;
+		 
+		 sphere5.position.y = 10;
+		 sphere5.position.x = -50;
+		 
+		 sphere6.position.y = 10;
+		 sphere6.position.x = -50;
+		 sphere6.position.z = 10;
+		 
+		 
+		 //primer folow camere
+		 
+		/* var camera = new BABYLON.FollowCamera("FollowCam", new BABYLON.Vector3(0, 20, 20), scene);
+		camera.target = sphere;
+		camera.radius = 30; // how far from the object to follow
+		camera.heightOffset = 8; // how high above the object to place the camera
+		camera.rotationOffset = 180; // the viewing angle
+		camera.cameraAcceleration = 0.05 // how fast to move
+		camera.maxCameraSpeed = 20 // speed limit
+		 camera.attachControl(canvas, false);*/
+		 
+		 // ji dodamo texturo
+		 var materialSphere1 = new BABYLON.StandardMaterial("texture1", scene);
+		materialSphere1.diffuseTexture = new BABYLON.Texture("granite-small.jpg", scene);
+		
+		sphere.material = materialSphere1;
+		sphere1.material = materialSphere1;
+		sphere2.material = materialSphere1;
+		sphere3.material = materialSphere1;
+		sphere4.material = materialSphere1;
+		sphere5.material = materialSphere1;
+		sphere6.material = materialSphere1;
+		
+		
+		var line1 = BABYLON.Mesh.CreateLines("lines", [
+        new BABYLON.Vector3(-75, 3, -50),
+        new BABYLON.Vector3(75, 3, -50),
+        
+	], scene);
+	
+		var line2 = BABYLON.Mesh.CreateLines("lines", [
+        new BABYLON.Vector3(75, 3, -50),
+        new BABYLON.Vector3(75, 3, 50),
+	], scene);
+	var line3 = BABYLON.Mesh.CreateLines("lines", [
+        new BABYLON.Vector3(75, 3, 50),
+        new BABYLON.Vector3(-75, 3, 50),
+	], scene);
+	var line4 = BABYLON.Mesh.CreateLines("lines", [
+        new BABYLON.Vector3(-75, 3, 50),
+		new BABYLON.Vector3(-75, 3, -50)
+	], scene);
+		// spravimo vsa telesa v spremenljivko za sence in odseve
+		var items = [sphere, sphere1,sphere2,sphere3,sphere4,sphere5,sphere6];
+		
+		
+		
+		
+         // naredimo 4 luči
+		 var lightPow = 0.25;
+		var light1 = new BABYLON.SpotLight("spot1", new BABYLON.Vector3(60, 70, 40), new BABYLON.Vector3(-1, -2, -1), 1.4, 1, scene);
+		light1.intensity = lightPow;
+
+		var lightSphere1 = BABYLON.Mesh.CreateSphere("sphere", 10, 2, scene);
+		lightSphere1.position = light1.position;
+		lightSphere1.material = new BABYLON.StandardMaterial("light", scene);
+		lightSphere1.material.emissiveColor = new BABYLON.Color3(1, 1, 0);
+		
+		var light2 = new BABYLON.SpotLight("spot2", new BABYLON.Vector3( -60, 70, 40), new BABYLON.Vector3(1, -2, -1), 1.4, 1, scene);
+		light2.intensity = lightPow;
+
+		var lightSphere2 = BABYLON.Mesh.CreateSphere("sphere", 10, 2, scene);
+		lightSphere2.position = light2.position;
+		lightSphere2.material = new BABYLON.StandardMaterial("light", scene);
+		lightSphere2.material.emissiveColor = new BABYLON.Color3(1, 1, 0);
+		
+		
+		var light3 = new BABYLON.SpotLight("spot3", new BABYLON.Vector3( 60, 70, -40), new BABYLON.Vector3(-1, -2, 1), 1.4, 1, scene);
+		light3.intensity = lightPow;
+
+		var lightSphere3 = BABYLON.Mesh.CreateSphere("sphere", 10, 2, scene);
+		lightSphere3.position = light3.position;
+		lightSphere3.material = new BABYLON.StandardMaterial("light", scene);
+		lightSphere3.material.emissiveColor = new BABYLON.Color3(1, 1, 0);
+		
+		
+		var light4 = new BABYLON.SpotLight("spot5", new BABYLON.Vector3( -60, 70, -40), new BABYLON.Vector3(1, -2, 1), 1.4, 1, scene);
+		light4.intensity = lightPow;
+
+		var lightSphere4 = BABYLON.Mesh.CreateSphere("sphere", 10, 2, scene);
+		lightSphere4.position = light4.position;
+		lightSphere4.material = new BABYLON.StandardMaterial("light", scene);
+		lightSphere4.material.emissiveColor = new BABYLON.Color3(1, 1, 0);
+
+        
+		
+         // Move the sphere upward 1/2 its height
+         sphere.position.y = 5/2;
+         // Let's try our built-in 'ground' shape. Params: name, width, depth, subdivisions, scene
+         var ground = BABYLON.Mesh.CreateGround("ground1", 150, 100, 2, scene);
+         // nalimamo texturo na ground
+		 var materialPlane = new BABYLON.StandardMaterial("groundPlane", scene);
+		materialPlane.diffuseTexture = new BABYLON.Texture("ice2_small.jpg", scene);
+		
+		materialPlane.diffuseTexture.uScale = 5.0;//Repeat 5 times on the Vertical Axes
+		materialPlane.diffuseTexture.vScale = 5.0;//Repeat 5 times on the Horizontal Axes
+		materialPlane.backFaceCulling = false;//Always show the front and the back of an element
+		
+		// dodamo odseve
+		
+		materialPlane.reflectionTexture = new BABYLON.MirrorTexture("mirror",512, scene, true);
+		materialPlane.reflectionTexture.mirrorPlane = new BABYLON.Plane(0, -1, 0, -0.2);
+		materialPlane.reflectionTexture.renderList = items;
+		
+		
+		ground.material = materialPlane;
+		
+		// generiramo sence
+		
+		var shadowGenerator1 = new BABYLON.ShadowGenerator(1024, light1);
+		shadowGenerator1.getShadowMap().renderList = items;
+		shadowGenerator1.useVarianceSampling = true;
+
+		var shadowGenerator2 = new BABYLON.ShadowGenerator(1024, light2);
+		shadowGenerator2.getShadowMap().renderList = items;
+		shadowGenerator2.useVarianceSampling = true;
+		
+		var shadowGenerator3 = new BABYLON.ShadowGenerator(1024, light3);
+		shadowGenerator3.getShadowMap().renderList = items;
+		shadowGenerator3.useVarianceShadowMap = true;
+
+		
+		var shadowGenerator4 = new BABYLON.ShadowGenerator(1024, light4);
+		shadowGenerator4.getShadowMap().renderList = items;
+		shadowGenerator4.useVarianceShadowMap = true;
+
+		ground.receiveShadows = true;
+		
+		
+
+		// Enable Collisions
+		scene.collisionsEnabled = true;
+
+		//omogocimo gravitacijo in kolizijo predmetom
+		sphere.checkCollisions = true;
+		sphere2.checkCollisions = true;
+		sphere.applyGravity = true;
+		sphere2.applyGravity = true;
+		
+		ground.checkCollisions = true;
+		ground.setPhysicsState({ impostor: BABYLON.PhysicsEngine.BoxImpostor, move:false});
+		line1.setPhysicsState({ impostor: BABYLON.PhysicsEngine.BoxImpostor, move:false});
+		line2.setPhysicsState({ impostor: BABYLON.PhysicsEngine.BoxImpostor, move:false});
+		line3.setPhysicsState({ impostor: BABYLON.PhysicsEngine.BoxImpostor, move:false});
+		line4.setPhysicsState({ impostor: BABYLON.PhysicsEngine.BoxImpostor, move:false});
+		
+		
+		x = sphere.setPhysicsState({impostor:BABYLON.PhysicsEngine.SphereImpostor, move:true, mass:15, friction:0.5, restitution:0.2});
+		sphere1.setPhysicsState({impostor:BABYLON.PhysicsEngine.SphereImpostor, move:true, mass:5, friction:0.5, restitution:0.2});
+		sphere2.setPhysicsState({impostor:BABYLON.PhysicsEngine.SphereImpostor, move:true, mass:5, friction:0.5, restitution:0.2});
+		sphere3.setPhysicsState({impostor:BABYLON.PhysicsEngine.SphereImpostor, move:true, mass:5, friction:0.5, restitution:0.2});
+		sphere4.setPhysicsState({impostor:BABYLON.PhysicsEngine.SphereImpostor, move:true, mass:5, friction:0.5, restitution:0.2});
+		sphere5.setPhysicsState({impostor:BABYLON.PhysicsEngine.SphereImpostor, move:true, mass:5, friction:0.5, restitution:0.2});
+		sphere6.setPhysicsState({impostor:BABYLON.PhysicsEngine.SphereImpostor, move:true, mass:5, friction:0.5, restitution:0.2});
+		
+		
+		
+		camera.checkCollisions = true;
+
+		window.addEventListener("keydown", function(e){
+		if (e.keyCode == "65")
+		sphere.applyImpulse(new BABYLON.Vector3(0,0,-5), sphere.position);
+		else if (e.keyCode == "68")
+		sphere.applyImpulse(new BABYLON.Vector3(0,0,5), sphere.position);
+		else if (e.keyCode == "83")
+		sphere.applyImpulse(new BABYLON.Vector3(5,0,0), sphere.position);
+		else if (e.keyCode == "87")
+		sphere.applyImpulse(new BABYLON.Vector3(-5,0,0), sphere.position);
+	  
+	  }, false);
+	  x.body.linearVelocity.scaleEqual(0.1);
+
+		
+          return scene;
+      }; // End of createScene function
+      // -------------------------------------------------------------
+      // Now, call the createScene function that you just finished creating
+      var scene = createScene();
+      // Register a render loop to repeatedly render the scene
+      engine.runRenderLoop(function () {
+         scene.render();
+      });
+      // Watch for browser/canvas resize events
+	  
+      window.addEventListener("resize", function () {
+         engine.resize();
+      });
+   </script>
+</body>
+</html>
