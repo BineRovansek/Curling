@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+        <title>Babylon.js sample code</title>
+        <!-- Babylon.js -->
+       <<script src="http://www.babylonjs.com/hand.minified-1.2.js"></script>
+        <script src="http://www.babylonjs.com/cannon.js"></script>
+        <script src="http://www.babylonjs.com/oimo.js"></script>
+        <script src="http://www.babylonjs.com/babylon.js"></script>
+        <style>
+            html, body {
+                overflow: hidden;
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+
+            #renderCanvas {
+                width: 100%;
+                height: 100%;
+                touch-action: none;
+            }
+        </style>
+    </head>
+<body>
+    <canvas id="renderCanvas"></canvas>
+    <script>
+        var canvas = document.getElementById("renderCanvas");
+        var engine = new BABYLON.Engine(canvas, true);
+
+        var createScene = function () {
+            var scene = new BABYLON.Scene(engine);
+            
+			
+			//Set gravity for the scene (G force like, on Y-axis) and enable physics
+			scene.enablePhysics(new BABYLON.Vector3(0, -200, 0), new BABYLON.OimoJSPlugin());
+			//camera
+			var canvas = engine.getRenderingCanvas();
+			
+			var camera = new BABYLON.ArcRotateCamera("Camera", 0, 0, 10, BABYLON.Vector3(50,0,0), scene);
+			camera.setPosition(new BABYLON.Vector3(0, 110, 0));
+
+			camera.alpha = Math.PI/2;
+			camera.mode = BABYLON.Camera.ORTHOGRAPHIC_CAMERA;
+			
+			camera.orthoTop =canvas.height/18;
+			camera.orthoBottom = -canvas.height/18;
+			camera.orthoLeft = -canvas.width/18;
+			camera.orthoRight = canvas.width/18;
+
+			// This targets the camera to scene origin
+			camera.setTarget(new BABYLON.Vector3.Zero());
+        
+            // Light
+             // naredimo 4 luči
+			var lightPow = 0.25;
+			var light1 = new BABYLON.SpotLight("spot1", new BABYLON.Vector3(60, 70, 40), new BABYLON.Vector3(-1, -2, -1), 1.6, 1, scene);
+			light1.intensity = lightPow;
+
+			var lightSphere1 = BABYLON.Mesh.CreateSphere("sphere", 10, 2, scene);
+			lightSphere1.position = light1.position;
+			lightSphere1.material = new BABYLON.StandardMaterial("light", scene);
+			lightSphere1.material.emissiveColor = new BABYLON.Color3(1, 1, 0);
+			
+			var light2 = new BABYLON.SpotLight("spot2", new BABYLON.Vector3( -60, 70, 40), new BABYLON.Vector3(1, -2, -1), 1.6, 1, scene);
+			light2.intensity = lightPow;
+
+			var lightSphere2 = BABYLON.Mesh.CreateSphere("sphere", 10, 2, scene);
+			lightSphere2.position = light2.position;
+			lightSphere2.material = new BABYLON.StandardMaterial("light", scene);
+			lightSphere2.material.emissiveColor = new BABYLON.Color3(1, 1, 0);
+			
+			
+			var light3 = new BABYLON.SpotLight("spot3", new BABYLON.Vector3( 60, 70, -40), new BABYLON.Vector3(-1, -2, 1), 1.6, 1, scene);
+			light3.intensity = lightPow;
+
+			var lightSphere3 = BABYLON.Mesh.CreateSphere("sphere", 10, 2, scene);
+			lightSphere3.position = light3.position;
+			lightSphere3.material = new BABYLON.StandardMaterial("light", scene);
+			lightSphere3.material.emissiveColor = new BABYLON.Color3(1, 1, 0);
+			
+			
+			var light4 = new BABYLON.SpotLight("spot5", new BABYLON.Vector3( -60, 70, -40), new BABYLON.Vector3(1, -2, 1), 1.6, 1, scene);
+			light4.intensity = lightPow;
+
+			var lightSphere4 = BABYLON.Mesh.CreateSphere("sphere", 10, 2, scene);
+			lightSphere4.position = light4.position;
+			lightSphere4.material = new BABYLON.StandardMaterial("light", scene);
+			lightSphere4.material.emissiveColor = new BABYLON.Color3(1, 1, 0);
+			
+			// Meshes
+			var items = [];
+			
+			var KAMEN;
+			BABYLON.SceneLoader.ImportMesh("curlingStone", "scenes/", "curlingstone.babylon", scene, function (newMeshes, items) {
+			// Set the target of the camera to the first imported mesh
+			var kamen = newMeshes[0];
+			//camera.target = kamen;
+			kamen.scaling = new BABYLON.Vector3(0.2, 0.2, 0.2);
+			kamen.rotation.y = Math.PI/2;
+			kamen.setVisible = true;
+			kamen.checkCollisions = true;
+			kamen.applyGravity = true;
+			var materialRock = new BABYLON.StandardMaterial("texture1", scene);
+			materialRock.difuseTexture = new BABYLON.Texture("granite-small.jpg", scene);
+			kamen.material = materialRock;
+			kamen.setPhysicsState({impostor:BABYLON.PhysicsEngine.CylinderImpostor, move:true, mass:20, friction:0.2, restitution:0.02});
+			KAMEN = kamen;
+			items.push(kamen);
+			});
+			
+            // Ground
+             var ground = BABYLON.Mesh.CreateGround("ground1", 150, 100, 2, scene);
+			 // nalimamo texturo na ground
+			 var groundPlane = new BABYLON.StandardMaterial("groundPlane", scene);
+			groundPlane.diffuseTexture = new BABYLON.Texture("ice2_small.jpg", scene);
+			
+			groundPlane.diffuseTexture.uScale = 5.0;//Repeat 5 times on the Vertical Axes
+			groundPlane.diffuseTexture.vScale = 5.0;//Repeat 5 times on the Horizontal Axes
+			groundPlane.backFaceCulling = false;//Always show the front and the back of an element
+			ground.material = groundPlane;
+			
+			
+			var krog = new BABYLON.StandardMaterial("krog",scene);
+			krog.diffuseTexture = new BABYLON.Texture("krog1.jpg",scene);
+			//krog.alpha = 0.4;
+			
+			var house1 = BABYLON.Mesh.CreatePlane("krog1",36,scene);
+			house1.material = krog;
+			house1.position.x = 50;
+			house1.position.y = 0.01;
+			house1.rotation.x = Math.PI/2;
+			
+			items.push(KAMEN);
+			// dodamo odseve
+			var mirror = BABYLON.Mesh.CreateGround("mirror",  150, 100, 2, scene);
+			// var mirror2 = BABYLON.Mesh.CreatePlane("mirror", 100, scene);
+			
+			var mirrorPlane = new BABYLON.StandardMaterial("mirrorPlane", scene);
+			mirrorPlane.diffuseTexture = new BABYLON.Texture("ice2_small.jpg", scene);
+			mirrorPlane.reflectionTexture = new BABYLON.MirrorTexture("mirror",512, scene, true);
+			mirrorPlane.reflectionTexture.mirrorPlane = new BABYLON.Plane(0, -1, 0, -0.05);
+			mirrorPlane.alpha = 0.5;
+			mirrorPlane.reflectionTexture.renderList = items;
+			console.log(items);
+			console.log(KAMEN);
+			mirror.material = mirrorPlane;
+			mirror.position.y = 0.05;
+			
+			
+			// generiramo sence
+			
+			var shadowGenerator1 = new BABYLON.ShadowGenerator(1024, light1);
+			shadowGenerator1.getShadowMap().renderList = items;
+			shadowGenerator1.useVarianceSampling = true;
+
+			var shadowGenerator2 = new BABYLON.ShadowGenerator(1024, light2);
+			shadowGenerator2.getShadowMap().renderList = items;
+			shadowGenerator2.useVarianceSampling = true;
+			
+			var shadowGenerator3 = new BABYLON.ShadowGenerator(1024, light3);
+			shadowGenerator3.getShadowMap().renderList = items;
+			shadowGenerator3.useVarianceShadowMap = true;
+
+			
+			var shadowGenerator4 = new BABYLON.ShadowGenerator(1024, light4);
+			shadowGenerator4.getShadowMap().renderList = items;
+			shadowGenerator4.useVarianceShadowMap = true;
+
+			ground.receiveShadows = true;
+        
+		
+			//fizika
+            scene.collisionsEnabled = true;
+			ground.checkCollisions = true;
+			ground.setPhysicsState({ impostor: BABYLON.PhysicsEngine.BoxImpostor, move:false});
+			
+            // Events
+            var canvas = engine.getRenderingCanvas();
+            var startingPoint;
+            var currentMesh;
+			window.addEventListener("keydown", function(e){
+		if (e.keyCode == "65"){
+		KAMEN.applyImpulse(new BABYLON.Vector3(0,0,-5), KAMEN.position);
+		}
+		else if (e.keyCode == "68")
+		KAMEN.applyImpulse(new BABYLON.Vector3(0,0,5), KAMEN.position);
+		else if (e.keyCode == "83")
+		KAMEN.applyImpulse(new BABYLON.Vector3(40,0,0), KAMEN.position);
+		else if (e.keyCode == "87")
+		KAMEN.applyImpulse(new BABYLON.Vector3(-5,0,0), KAMEN.position);
+	  
+	  }, false);
+			
+            var getGroundPosition = function () {
+                // Use a predicate to get position on the ground
+                var pickinfo = scene.pick(scene.pointerX, scene.pointerY, 5);
+                if (pickinfo.hit) {
+                    return pickinfo.pickedPoint;
+                }
+        
+                return null;
+            }
+        
+            var onPointerDown = function (evt) {
+                if (evt.button !== 0) {
+                    return;
+                }
+        
+                // check if we are under a mesh
+                var pickInfo = scene.pick(scene.pointerX, scene.pointerY, function (mesh) { return mesh !== ground; });
+                if (pickInfo.hit) {
+                    currentMesh = pickInfo.pickedMesh;
+                    startingPoint = getGroundPosition(evt);
+        
+                    if (startingPoint) { // we need to disconnect camera from canvas
+                        setTimeout(function () {
+                            camera.detachControl(canvas);
+                        }, 0);
+                    }
+                }
+            }
+        
+            var onPointerUp = function () {
+                if (startingPoint) {
+                    camera.attachControl(canvas, true);
+                    startingPoint = null;
+                    return;
+                }
+            }
+        
+            var onPointerMove = function (evt) {
+			console.log("y");
+                if (!startingPoint) {
+                    return;
+                }
+        
+                var current = getGroundPosition(evt);
+        
+                if (!current) {
+                    return;
+                }
+        
+                var diff = current.subtract(startingPoint);
+                currentMesh.position.addInPlace(diff);
+        
+                startingPoint = current;
+        
+            }
+        
+            canvas.addEventListener("pointerdown", onPointerDown, false);
+            canvas.addEventListener("pointerup", onPointerUp, false);
+            canvas.addEventListener("pointermove", onPointerMove, false);
+        
+            scene.onDispose = function () {
+                canvas.removeEventListener("pointerdown", onPointerDown);
+                canvas.removeEventListener("pointerup", onPointerUp);
+                canvas.removeEventListener("pointermove", onPointerMove);
+            }
+        
+            return scene;
+        };
+        
+        var scene = createScene();
+
+        engine.runRenderLoop(function () {
+            scene.render();
+        });
+
+        // Resize
+        window.addEventListener("resize", function () {
+            engine.resize();
+        });
+    </script>
+</body>
+</html>

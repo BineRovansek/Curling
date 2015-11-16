@@ -10,7 +10,8 @@
 		num uvs2           :  0
 		num colors         :  0
 		num indices        :  20928
+	processing begun of light (SUN):  Sun
 ========= Writing of scene file started =========
 ========= Writing of scene file completed =========
 ========= end of processing =========
-elapsed time:  0 min, 0.9955 secs
+elapsed time:  0 min, 0.8846 secs

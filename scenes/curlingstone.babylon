@@ -1,4 +1,4 @@
-{"autoClear":true,"clearColor":[0.0509,0.0509,0.0509],"ambientColor":[0,0,0],"gravity":[0,-9.81,0],
+{"autoClear":true,"clearColor":[0,0,0],"ambientColor":[0.2,0.2,0.3],"gravity":[0,-9.81,0],
 "materials":[],
 "multiMaterials":[],
 "skeletons":[],
@@ -10,6 +10,6 @@
 ,"instances":[]}
 ],
 "cameras":[],
-"lights":[],
+"lights":[{"name":"Sun","id":"Sun","type":1,"position":[1.3967,6.4413,1.6681],"direction":[0,-1,0],"intensity":1,"diffuse":[1,1,1],"specular":[1,1,1]}],
 "shadowGenerators":[]
 }

@@ -15,19 +15,31 @@
          width: 100%;
          height: 100%;
          touch-action: none;
+		 cursor : none;
       }
    </style>
    <script src="./Babylon.js-master/dist/babylon.2.2.js"></script>
-   <script src="hand.js"></script> 
+   <script src="./Babylon.js-master/dist/hand.minified-1.2.js"></script> 
    <script src="./Babylon.js-master/dist/Oimo.js"></script>
 </head>
 <body>
    <canvas id="renderCanvas"></canvas>
    <script type="text/javascript">
-   
-	 var KAMEN;
+	var KAMEN; var KAMEN1; ;var ribbon;
+	var faza = 1;
+	var postavljen = 0;
+	var target = BABYLON.Vector3.Zero();
+	var start = new BABYLON.Vector3(0,3,0);
+	var curve = 0;
+	
+	
+	//fizikalne konstante
+	var mass = 20;
+	var g = -20;
+	var ktr = 0.2;
       // Get the canvas element from our HTML below
       var canvas = document.querySelector("#renderCanvas");
+	  canvas.style.cursor = "none";
       // Load the BABYLON 3D engine
       var engine = new BABYLON.Engine(canvas, true);
 	  
@@ -38,16 +50,37 @@
         var scene = new BABYLON.Scene(engine);
 		
 		//Set gravity for the scene (G force like, on Y-axis) and enable physics
-		scene.enablePhysics(new BABYLON.Vector3(0, -200, 0), new BABYLON.OimoJSPlugin());
-         // Change the scene background
-        //scene.clearColor = new BABYLON.Color3(0.2, 0.2, 0.7);
-        // This creates and positions a free camera
-        /*var camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(110, 60, 0), scene);
-        // This targets the camera to scene origin
-        camera.setTarget(BABYLON.Vector3.Zero());
-         // This attaches the camera to the canvas
-        camera.attachControl(canvas, false);*/
+		scene.enablePhysics(new BABYLON.Vector3(0, g, 0), new BABYLON.OimoJSPlugin());
+		
+		
+		var camera1 = new BABYLON.ArcRotateCamera("Camera", 0, 0, 10, BABYLON.Vector3(50,0,0), scene);
+		camera1.setPosition(new BABYLON.Vector3(0, 110, 0));
 
+		camera1.alpha = Math.PI/2;
+		camera1.mode = BABYLON.Camera.ORTHOGRAPHIC_CAMERA;
+		
+		camera1.orthoTop =canvas.height/12;
+		camera1.orthoBottom = -canvas.height/12;
+		camera1.orthoLeft = -canvas.width/12;
+		camera1.orthoRight = canvas.width/12;
+
+    // This targets the camera to scene origin
+		camera1.setTarget(new BABYLON.Vector3.Zero());
+		
+
+		
+		  //primer folow camere
+		 
+		var camera2 = new BABYLON.FollowCamera("FollowCam", new BABYLON.Vector3(0, 50, 0), scene);
+		camera2.rotation.y = 180;
+		camera2.radius = 30; // how far from the object to follow
+		camera2.heightOffset = 8; // how high above the object to place the camera
+		camera2.rotationOffset = 0; // the viewing angle
+		camera2.cameraAcceleration = 0.05 // how fast to move
+		camera2.maxCameraSpeed = 30 // speed limit
+		//camera2.attachControl(canvas, false);
+		scene.activeCamera = camera1;
+		/*
        	 // Skybox
             var skybox = BABYLON.Mesh.CreateBox("skyBox", 10000.0, scene);
             var skyboxMaterial = new BABYLON.StandardMaterial("skyBox", scene);
@@ -58,12 +91,12 @@
             skyboxMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
             skyboxMaterial.disableLighting = true;
             skybox.material = skyboxMaterial;
-			
+			*/
 		
 		 // Let's try our built-in 'sphere' shape. Params: name, subdivisions, size, scene
 		 
 		sphere = new BABYLON.Mesh.CreateBox("crate", 2, scene);
-		 
+		 sphere.position.x = -70;
          //var sphere = BABYLON.Mesh.CreateSphere("sphere", 16, 5, scene);
 		 
 		 //sphere.position.y = 10;
@@ -99,39 +132,29 @@
 		 sphere6.position.z = 10;
 		  
 		  
-		  //primer folow camere
-		 
-		var camera = new BABYLON.FollowCamera("FollowCam", new BABYLON.Vector3(0, 50, 0), scene);
-		camera.rotation.y = 180;
-		camera.radius = 30; // how far from the object to follow
-		camera.heightOffset = 8; // how high above the object to place the camera
-		camera.rotationOffset = 0; // the viewing angle
-		camera.cameraAcceleration = 0.05 // how fast to move
-		camera.maxCameraSpeed = 30 // speed limit
-		camera.attachControl(canvas, false);
-				
 		
-		
+		// spravimo vsa telesa v spremenljivko za sence in odseve !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		var items = [sphere, sphere1,sphere2,sphere3,sphere4];
 		
 		BABYLON.SceneLoader.ImportMesh("curlingStone", "scenes/", "curlingstone.babylon", scene, function (newMeshes, items) {
         // Set the target of the camera to the first imported mesh
         var kamen = newMeshes[0];
-		camera.target = kamen;
+		
         kamen.scaling = new BABYLON.Vector3(0.2, 0.2, 0.2);
-        kamen.rotation.y = Math.PI/2;
+        kamen.rotation.y = -Math.PI/2;
         kamen.setVisible = true;
         kamen.checkCollisions = true;
 		kamen.applyGravity = true;
 		var materialRock = new BABYLON.StandardMaterial("texture1", scene);
-		materialRock.diffuseTexture = new BABYLON.Texture("granite-small.jpg", scene);
+		materialRock.difuseTexture = new BABYLON.Texture("granite-small.jpg", scene);
 		kamen.material = materialRock;
-		kamen.setPhysicsState({impostor:BABYLON.PhysicsEngine.CylinderImpostor, move:true, mass:50, friction:0.5, restitution:0.02});
-		KAMEN = kamen;
-		items.push(kamen);
+		kamen.setPhysicsState({impostor:BABYLON.PhysicsEngine.CylinderImpostor, move:true, mass:mass, friction:ktr, restitution:0.02});
+		KAMEN = kamen.clone();
+		kamen.dispose();
+		//camera.target = KAMEN;
     	});
 		
-		
+
 		
 		
 		 
@@ -166,8 +189,6 @@
         new BABYLON.Vector3(-75, 3, 50),
 		new BABYLON.Vector3(-75, 3, -50)
 	], scene);
-		// spravimo vsa telesa v spremenljivko za sence in odseve !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		
 		
 		
 		
@@ -224,6 +245,19 @@
 		ground.material = groundPlane;
 		
 		
+		var krog = new BABYLON.StandardMaterial("krog",scene);
+		krog.diffuseTexture = new BABYLON.Texture("krog1.jpg",scene);
+		//krog.alpha = 0.4;
+		
+		
+		
+		
+		var house1 = BABYLON.Mesh.CreatePlane("krog1",36,scene);
+		house1.material = krog;
+		house1.position.x = 50;
+		house1.position.y = 0.01;
+		house1.rotation.x = Math.PI/2;
+		
 		
 		// dodamo odseve
 		var mirror = BABYLON.Mesh.CreateGround("mirror",  150, 100, 2, scene);
@@ -232,12 +266,12 @@
 		var mirrorPlane = new BABYLON.StandardMaterial("mirrorPlane", scene);
 		mirrorPlane.diffuseTexture = new BABYLON.Texture("ice2_small.jpg", scene);
 		mirrorPlane.reflectionTexture = new BABYLON.MirrorTexture("mirror",512, scene, true);
-		mirrorPlane.reflectionTexture.mirrorPlane = new BABYLON.Plane(0, -1, 0, -0.01);
+		mirrorPlane.reflectionTexture.mirrorPlane = new BABYLON.Plane(0, -1, 0, -0.05);
 		mirrorPlane.alpha = 0.5;
 		mirrorPlane.reflectionTexture.renderList = items;
 		
 		mirror.material = mirrorPlane;
-		mirror.position.y = 0.01;
+		mirror.position.y = 0.05;
 		
 		
 		// generiramo sence
@@ -280,7 +314,7 @@
 		line4.setPhysicsState({ impostor: BABYLON.PhysicsEngine.BoxImpostor, move:false});
 		
 		
-		fric = 0.9;
+		fric = 0.1;
 		rest = 0.05;
 		x = sphere.setPhysicsState({impostor:BABYLON.PhysicsEngine.BoxImpostor, move:true, mass:15, friction:fric, restitution:rest});
 		sphere1.setPhysicsState({impostor:BABYLON.PhysicsEngine.SphereImpostor, move:true, mass:5, friction:fric, restitution:rest});
@@ -289,26 +323,124 @@
 		sphere4.setPhysicsState({impostor:BABYLON.PhysicsEngine.SphereImpostor, move:true, mass:5, friction:fric, restitution:rest});
 		sphere5.setPhysicsState({impostor:BABYLON.PhysicsEngine.SphereImpostor, move:true, mass:5, friction:fric, restitution:rest});
 		sphere6.setPhysicsState({impostor:BABYLON.PhysicsEngine.SphereImpostor, move:true, mass:5, friction:fric, restitution:rest});
-		
-		
-		
-		camera.checkCollisions = true;
+		 x.body.linearVelocity.scaleEqual(2);
 
+		// event handlers
+		
+		var Path = function (x,offset) {
+			var lengthx = target.x-start.x;
+			var lengthy = target.z-start.z;
+			var omega = Math.atan(lengthy/(lengthx+0.001));
+			var path = [];
+			length = target.x - (start.x+1);
+			for (var i = start.x; i < target.x+1; i++) {
+				var curr = [];
+				z = start.z+((target.z/length)*i) + Math.sin(i/length*Math.PI)*offset*target.z/Math.abs(target.z)
+				curr.push(new BABYLON.Vector3(i , 0.3, z-(x/2)/Math.cos(omega))) ;
+				curr.push(new BABYLON.Vector3(i , 0.3, z));
+				curr.push(new BABYLON.Vector3(i , 0.3,  z+(x/2)/Math.cos(omega))) ;
+				path.push(curr);
+			}
+			return path;
+		};
+		
+		// tektura za ribbon
+		var ribbonMaterial = new BABYLON.StandardMaterial("ribbonMaterial", scene);
+		ribbonMaterial.diffuseColor = new BABYLON.Color3(.5,1, 0); //Red
+		ribbonMaterial.alpha = 0.5;
+		// ribbon
+		pot = Path(3,curve);
+		ribbon = BABYLON.Mesh.CreateRibbon("ribbon", pot, false, false, 0, scene);
+		
 		window.addEventListener("keydown", function(e){
-		if (e.keyCode == "65"){
-		KAMEN.applyImpulse(new BABYLON.Vector3(0,0,-5), KAMEN.position);
-		KAMEN.setRotation(new BABYLON.Vector3(1,0,0));
+		if (e.keyCode == "65"&& curve > -5){
+			ribbon.dispose();
+			curve = curve - 0.1;
+			pot = Path(3,curve);
+			ribbon = BABYLON.Mesh.CreateRibbon("ribbon", pot, false, false, 0, scene);
+			ribbon.material = ribbonMaterial;
 		}
-		else if (e.keyCode == "68")
-		KAMEN.applyImpulse(new BABYLON.Vector3(0,0,5), KAMEN.position);
+		else if (e.keyCode == "68" && curve < 5){
+			ribbon.dispose();
+			curve = curve + 0.1;
+			pot = Path(3,curve);
+			ribbon = BABYLON.Mesh.CreateRibbon("ribbon", pot, false, false, 0, scene);
+			ribbon.material = ribbonMaterial;
+			}
+		else if (e.keyCode == "32"){
+			if(faza == 1){
+			scene.activeCamera = camera2;
+			faza = faza + 1;
+			var lengthx = target.x-start.x;
+			var lengthy = target.z-start.z;
+			var omega = Math.atan(lengthy/(lengthx+0.001));
+			
+			var length = lengthx/Math.cos(omega);
+			
+			var impulse = (-(g)*ktr*Math.sqrt((2*(length))/(-(g)*ktr)));
+			console.log(omega);
+			KAMEN1.applyImpulse(new BABYLON.Vector3(impulse*Math.cos(omega),0,impulse*Math.sin(omega)),KAMEN1.position);
+			}
+		
+		}
 		else if (e.keyCode == "83")
-		KAMEN.applyImpulse(new BABYLON.Vector3(5,0,0), KAMEN.position);
-		else if (e.keyCode == "87")
-		KAMEN.applyImpulse(new BABYLON.Vector3(-50,0,0), KAMEN.position);
+			KAMEN1.applyImpulse(new BABYLON.Vector3(40,0,0), KAMEN1.position);
+		else if (e.keyCode == "87"){}
+			
 	  
 	  }, false);
-	  x.body.linearVelocity.scaleEqual(2);
+	 
 
+		
+		
+	var onPointerMove = function () {
+
+		
+		if(faza == 1 && postavljen == 0){
+			ribbon.dispose();
+			KAMEN.position = new BABYLON.Vector3((-(scene.pointerX-screen.width/2)/(canvas.width/screen.width))/4, 3, ((scene.pointerY-screen.height/2)/(screen.height/canvas.height))/4+12);
+			target = KAMEN.position;
+			pot = Path(3,curve);
+			
+			ribbon = BABYLON.Mesh.CreateRibbon("ribbon", pot, false, false, 0, scene);
+			ribbon.material = ribbonMaterial;
+		}
+       
+
+    }
+	
+	var onPointerDown = function () {
+		
+		if(faza == 1 && postavljen == 0){
+			ribbon.dispose();
+			postavljen = 1;
+			KAMEN.position = new BABYLON.Vector3((-(scene.pointerX-screen.width/2)/(canvas.width/screen.width))/4, 15, ((scene.pointerY-screen.height/2)/(screen.height/canvas.height))/4+12);
+			target = KAMEN.position;
+			KAMEN1 = KAMEN.clone();
+			KAMEN1.position = new BABYLON.Vector3(0,3,0);
+			KAMEN1.setPhysicsState({impostor:BABYLON.PhysicsEngine.CylinderImpostor, move:true, mass:mass, friction:ktr, restitution:0.02});
+			var pot = [];
+			curve = 0;
+			pot = Path(3,curve);
+			ribbon = BABYLON.Mesh.CreateRibbon("ribbon", pot, false, false, 0, scene);
+			ribbon.material = ribbonMaterial;
+			camera2.target = KAMEN1;
+			//scene.activeCamera = camera2;
+		}
+	
+	}
+	
+	console.log(ground)
+		
+		canvas.addEventListener("pointermove", onPointerMove, false);
+		canvas.addEventListener("pointerdown", onPointerDown, false);
+		
+		console.log("x");
+		scene.onDispose = function () {
+        canvas.removeEventListener("pointerdown", onPointerDown);
+        canvas.removeEventListener("pointerup", onPointerUp);
+        canvas.removeEventListener("pointermove", onPointerMove);
+    }
 		
           return scene;
       }; // End of createScene function
@@ -319,6 +451,8 @@
       engine.runRenderLoop(function () {
          scene.render();
       });
+	  
+	  
       // Watch for browser/canvas resize events
 	  
       window.addEventListener("resize", function () {
