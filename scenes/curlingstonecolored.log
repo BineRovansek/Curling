@@ -1,0 +1,25 @@
+	Exporter version: 3.0.6, Blender version: 2.76 (sub 0)
+========= Conversion from Blender to Babylon.js =========
+	Python World class constructor completed
+	WARNING: No active camera has been assigned, or is not in a currently selected Blender layer
+	processing begun of mesh:  curlingStone
+		processing begun of Standard material:  kamenBaked
+		Diffuse texture found
+			Image texture found, type:  diffuseTexture, mapped using: "UVMap"
+		num positions      :  9678
+		num normals        :  9678
+		num uvs            :  19356
+		num uvs2           :  0
+		num colors         :  38712
+		num indices        :  20928
+	processing begun of light (AREA):  Area.001
+	processing begun of light (SUN):  Sun.001
+	processing begun of light (AREA):  Area
+	processing begun of light (HEMI):  Hemi.001
+	processing begun of light (HEMI):  Hemi
+	processing begun of light (SPOT):  Spot
+	processing begun of light (SUN):  Sun
+========= Writing of scene file started =========
+========= Writing of scene file completed =========
+========= end of processing =========
+elapsed time:  0 min, 2.7441 secs

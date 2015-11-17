@@ -31,7 +31,7 @@
 	var target = BABYLON.Vector3.Zero();
 	var start = new BABYLON.Vector3(0,3,0);
 	var curve = 0;
-	
+	var potiskov;
 	
 	//fizikalne konstante
 	var mass = 20;
@@ -132,11 +132,14 @@
 		 sphere6.position.z = 10;
 		  
 		  
+		  var materialRock = new BABYLON.StandardMaterial("texture1", scene);
+		materialRock.difuseTexture = new BABYLON.Texture("scenes/KamenRdečBaked.png", scene);
+		  
 		
 		// spravimo vsa telesa v spremenljivko za sence in odseve !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		var items = [sphere, sphere1,sphere2,sphere3,sphere4];
 		
-		BABYLON.SceneLoader.ImportMesh("curlingStone", "scenes/", "curlingstone.babylon", scene, function (newMeshes, items) {
+		BABYLON.SceneLoader.ImportMesh("curlingStone", "scenes/", "curlingstonecolored.babylon", scene, function (newMeshes, items) {
         // Set the target of the camera to the first imported mesh
         var kamen = newMeshes[0];
 		
@@ -145,8 +148,7 @@
         kamen.setVisible = true;
         kamen.checkCollisions = true;
 		kamen.applyGravity = true;
-		var materialRock = new BABYLON.StandardMaterial("texture1", scene);
-		materialRock.difuseTexture = new BABYLON.Texture("granite-small.jpg", scene);
+		
 		kamen.material = materialRock;
 		kamen.setPhysicsState({impostor:BABYLON.PhysicsEngine.CylinderImpostor, move:true, mass:mass, friction:ktr, restitution:0.02});
 		KAMEN = kamen.clone();
@@ -369,6 +371,8 @@
 			}
 		else if (e.keyCode == "32"){
 			if(faza == 1){
+			potiskov = 0;
+			KAMEN.dispose();
 			scene.activeCamera = camera2;
 			faza = faza + 1;
 			var lengthx = target.x-start.x;
@@ -377,7 +381,7 @@
 			
 			var length = lengthx/Math.cos(omega);
 			
-			var impulse = (-(g)*ktr*Math.sqrt((2*(length))/(-(g)*ktr)));
+			var impulse = (-(g)*ktr*Math.sqrt((2*(length))/(-(g)*ktr)))+2*curve;
 			console.log(omega);
 			KAMEN1.applyImpulse(new BABYLON.Vector3(impulse*Math.cos(omega),0,impulse*Math.sin(omega)),KAMEN1.position);
 			}
@@ -425,7 +429,8 @@
 			ribbon = BABYLON.Mesh.CreateRibbon("ribbon", pot, false, false, 0, scene);
 			ribbon.material = ribbonMaterial;
 			camera2.target = KAMEN1;
-			//scene.activeCamera = camera2;
+			items.push(KAMEN1); 	
+			KAMEN1.material = materialRock;
 		}
 	
 	}
@@ -442,6 +447,16 @@
         canvas.removeEventListener("pointermove", onPointerMove);
     }
 		
+		
+	// animacije
+	scene.registerBeforeRender(function () {
+		if(faza == 2 && KAMEN1.position.x > ((target.x - start.x)/100)*potiskov){
+		console.log("x")
+			potiskov = potiskov + 1;
+			KAMEN1.applyImpulse(new BABYLON.Vector3(0,0,-(curve*2)/100),KAMEN1.position);
+		}
+
+	});
           return scene;
       }; // End of createScene function
       // -------------------------------------------------------------
