@@ -25,7 +25,7 @@
 	<body>
 	   <canvas id="renderCanvas"></canvas>
 	   <script type="text/javascript">
-		var KAMEN ;var KAMENZELEN1; var KAMNIRDEČI = []; var KAMNIMODRI = []; var ZELEN; var ribbon; var metla; var KAMENMODER; var KAMENRED;
+		var KAMEN ;var KAMENZELEN1; var KAMNIRDEČI = []; var KAMNIMODRI = []; var ZELEN; var ribbon; var metla; var KAMENMODER; var KAMENRED; var powerbar; var powerselect; var zmagovalec;
 		var poteza = 0;
 		var stKamnov = 0;
 		var stKamnovPoteza = 0;
@@ -35,6 +35,13 @@
 		var start = new BABYLON.Vector3(0,3,0);
 		var curve = 0;
 		var potiskov;
+		var natančnost = 0;
+		
+		
+		//nastavitve
+		
+		var kvalitetaSenc = 10;
+		var lightPow = 0.4;
 		
 		//fizikalne konstante
 		var mass = 2000;
@@ -106,8 +113,9 @@
 			scene.activeCamera = camera1;
 			
 			 // Skybox
-				var skybox = BABYLON.Mesh.CreateBox("skyBox", 10000.0, scene);
+				var skybox = BABYLON.Mesh.CreateBox("skyBox", 1000.0, scene);
 				var skyboxMaterial = new BABYLON.StandardMaterial("skyBox", scene);
+				skybox.rotation.y = Math.PI;
 				skyboxMaterial.backFaceCulling = false;
 				skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture("textures/ice_mountain", scene);
 				skyboxMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;
@@ -121,7 +129,7 @@
 			
 			// spravimo vsa telesa v spremenljivko za sence in odseve !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 			var items = [];
-			
+			//importamo babylonove meshe
 			BABYLON.SceneLoader.ImportMesh("metla", "scenes/", "metla.babylon", scene, function (newMeshes, items) {
 			// Set the target of the camera to the first imported mesh
 				var me = newMeshes[0];
@@ -179,14 +187,33 @@
 				kamen.dispose();
 				
 			});
-
+			BABYLON.SceneLoader.ImportMesh("", "scenes/", "powerbar.babylon", scene, function (newMeshes, items) {
+			// Set the target of the camera to the first imported mesh
+				var bar = newMeshes[0];
+				bar.scaling = new BABYLON.Vector3(2, 2, 2);
+				bar.rotation.z = Math.PI/4;
+				bar.position = new BABYLON.Vector3(-12,-2,0);
+				bar.isVisible = false;
+				powerbar = bar.clone();
+				bar.dispose();
+			});
+			BABYLON.SceneLoader.ImportMesh("", "scenes/", "powesel.babylon", scene, function (newMeshes, items) {
+			// Set the target of the camera to the first imported mesh
+				var bar = newMeshes[0];
+				bar.scaling = new BABYLON.Vector3(2, 2, 2);
+				bar.rotation.z = Math.PI/4;
+				bar.position = new BABYLON.Vector3(-13,-1.2,0);
+				bar.isVisible = false;
+				powerselect = bar.clone();
+				bar.dispose();
+			});
 			
 			
 			
 			
 			
 			 // naredimo 4 luči
-			 var lightPow = 0.3;
+			 
 			var light1 = new BABYLON.SpotLight("spot1", new BABYLON.Vector3(200, 70, 40), new BABYLON.Vector3(-1, -2, -1), 1.6, 1, scene);
 			light1.intensity = lightPow;
 
@@ -207,7 +234,7 @@
 			 var groundPlane = new BABYLON.StandardMaterial("groundPlane", scene);
 			groundPlane.diffuseTexture = new BABYLON.Texture("ice2_small.jpg", scene);
 			
-			groundPlane.diffuseTexture.uScale = 5.0;//Repeat 5 times on the Vertical Axes
+			groundPlane.diffuseTexture.uScale = 20.0;//Repeat 5 times on the Vertical Axes
 			groundPlane.diffuseTexture.vScale = 5.0;//Repeat 5 times on the Horizontal Axes
 			groundPlane.backFaceCulling = false;//Always show the front and the back of an element
 			ground.material = groundPlane;
@@ -234,6 +261,8 @@
 			var mirrorPlane = new BABYLON.StandardMaterial("mirrorPlane", scene);
 			mirrorPlane.diffuseTexture = new BABYLON.Texture("ice2_small.jpg", scene);
 			mirrorPlane.reflectionTexture = new BABYLON.MirrorTexture("mirror",512, scene, true);
+			mirrorPlane.reflectionTexture.uScale = 20.0;//Repeat 5 times on the Vertical Axes
+			mirrorPlane.reflectionTexture.vScale = 5.0;//Repeat 5 times on the Horizontal Axes
 			mirrorPlane.reflectionTexture.mirrorPlane = new BABYLON.Plane(0, -1, 0, -0.05);
 			mirrorPlane.alpha = 0.5;
 			mirrorPlane.reflectionTexture.renderList = items;
@@ -243,20 +272,20 @@
 			mirror.position.x = 90;
 			// generiramo sence
 			
-			var shadowGenerator1 = new BABYLON.ShadowGenerator(1024, light1);
+			var shadowGenerator1 = new BABYLON.ShadowGenerator(Math.pow(2,kvalitetaSenc), light1);
 			shadowGenerator1.getShadowMap().renderList = items;
 			shadowGenerator1.useVarianceSampling = true;
 
-			var shadowGenerator2 = new BABYLON.ShadowGenerator(1024, light2);
+			var shadowGenerator2 = new BABYLON.ShadowGenerator(Math.pow(2,kvalitetaSenc), light2);
 			shadowGenerator2.getShadowMap().renderList = items;
 			shadowGenerator2.useVarianceSampling = true;
 			
-			var shadowGenerator3 = new BABYLON.ShadowGenerator(1024, light3);
+			var shadowGenerator3 = new BABYLON.ShadowGenerator(Math.pow(2,kvalitetaSenc), light3);
 			shadowGenerator3.getShadowMap().renderList = items;
 			shadowGenerator3.useVarianceShadowMap = true;
 
 			
-			var shadowGenerator4 = new BABYLON.ShadowGenerator(1024, light4);
+			var shadowGenerator4 = new BABYLON.ShadowGenerator(Math.pow(2,kvalitetaSenc), light4);
 			shadowGenerator4.getShadowMap().renderList = items;
 			shadowGenerator4.useVarianceShadowMap = true;
 
@@ -275,7 +304,50 @@
 			ground.setPhysicsState({ impostor: BABYLON.PhysicsEngine.BoxImpostor, move:false});
 			
 
-			// event handlers
+			// event handlers and functions !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+			var poisciZmagovalca = function (){
+			
+				var min = 300;
+				var BorR = -1;
+				var index = -1;
+				for (i = 0; i < KAMNIMODRI.length; i++){
+				console.log("H")
+				console.log(Math.sqrt(Math.pow(162-KAMNIMODRI[i].position.x,2)+Math.pow(KAMNIMODRI[i].position.z,2)))
+					if(Math.sqrt(Math.pow(162-KAMNIMODRI[i].position.x,2)+Math.pow(KAMNIMODRI[i].position.z,2)) < min){
+						min = Math.sqrt(Math.pow(162-KAMNIMODRI[i].position.x,2)+Math.pow(KAMNIMODRI[i].position.z,2));
+						BorR = 1;
+						index = i;
+					
+					}
+				}
+				for (i = 0; i < KAMNIRDEČI.length; i++){
+					if(Math.sqrt(Math.pow(162-KAMNIRDEČI[i].position.x,2)+Math.pow(KAMNIRDEČI[i].position.z,2)) < min){
+						min = Math.sqrt(Math.pow(162-KAMNIRDEČI[i].position.x,2)+Math.pow(KAMNIRDEČI[i].position.z,2));
+						BorR = 2;
+						index = i;
+					}
+				}
+				if(BorR == 1)
+					zmagovalec = KAMNIMODRI[index];
+				else if(BorR == 2)
+					zmagovalec = KAMNIRDEČI[index];
+				zmagovalec.position.y = 10;
+				scene.activeCamera = camera2;
+				camera2.target = zmagovalec;
+				faza = 4;
+				KAMEN.isVisible = false;
+				KAMENZELEN1.isVisible = false;
+			};
+			
+			var pocistiPredmete = function (predmeti) {
+				for (i = predmeti.length-1; i >= 0 ; i--){
+					console.log(predmeti)
+					predmeti[i].dispose();
+					predmeti.pop();
+					console.log(predmeti)
+				}
+			};
+			
 			var soPrimiru = function (stare, nove) {
 				if(stare.length != nove.length)
 					return false;
@@ -321,8 +393,7 @@
 			
 			// tektura za ribbon
 			var ribbonMaterial = new BABYLON.StandardMaterial("ribbonMaterial", scene);
-			ribbonMaterial.diffuseColor = new BABYLON.Color3(.5,1, 0); //Red
-			ribbonMaterial.alpha = 0.7;
+			ribbonMaterial.diffuseColor = new BABYLON.Color3(.3,.5, 0); //Red
 			// ribbon
 			pot = Path(3,curve);
 			ribbon = BABYLON.Mesh.CreateRibbon("ribbon", pot, false, false, 0, scene);
@@ -333,7 +404,7 @@
 				if(faza == 1 && postavljen == 1){
 				ribbon.dispose();
 				curve = curve - 0.1;
-				pot = Path(3,curve);
+				pot = Path(3.6,curve);
 				ribbon = BABYLON.Mesh.CreateRibbon("ribbon", pot, false, false, 0, scene);
 				ribbon.material = ribbonMaterial;
 				}	
@@ -342,7 +413,7 @@
 				if(faza == 1 && postavljen == 1){
 					ribbon.dispose();
 					curve = curve + 0.1;
-					pot = Path(3,curve);
+					pot = Path(3.6,curve);
 					ribbon = BABYLON.Mesh.CreateRibbon("ribbon", pot, false, false, 0, scene);
 					ribbon.material = ribbonMaterial;
 				}
@@ -350,20 +421,27 @@
 			else if (e.keyCode == "32"){
 				if(faza == 1){
 					skybox.isVisible = true;
-					metla.isVisible = true;
-					potiskov = 0;
+					faza = 1.1;
 					ribbon.isVisible = false;
 					KAMEN.isVisible = false;
 					KAMENZELEN1.isVisible = false;
+					powerbar.isVisible = true;
+					powerselect.isVisible = true;
 					scene.activeCamera = camera2;
-					faza = faza + 1;
+					
+					
+				}
+				else if (faza == 1.1){
+					metla.isVisible = true;
+					powerbar.isVisible = false;
+					powerselect.isVisible = false;
 					var lengthx = target.x-start.x;
 					var lengthy = target.z-start.z;
 					var omega = Math.atan(lengthy/(lengthx+0.001));
 					
 					var length = lengthx/Math.cos(omega);
 					
-					var impulse = (-(g)*ktr*Math.sqrt((2*(length))/(-(g)*ktr)));
+					var impulse = (-(g)*ktr*Math.sqrt((2*(length))/(-(g)*ktr)))+(powerselect.position.z*Math.random()*1.5);
 
 					
 					if(poteza == 0){
@@ -373,12 +451,11 @@
 						KAMNIRDEČI[stKamnov].applyImpulse(new BABYLON.Vector3(impulse*Math.cos(omega),0,impulse*Math.sin(omega)),KAMNIRDEČI[stKamnov].position);
 					}
 					curve = 0;
+					
+					faza = 2;
 				}
 			
 			}
-			else if (e.keyCode == "83"){}
-				//KAMEN1.applyImpulse(new BABYLON.Vector3(-10,0,0), KAMEN1.position);
-			else if (e.keyCode == "87"){}
 				
 		  
 		  }, false);
@@ -393,7 +470,7 @@
 				ribbon.dispose();
 				KAMEN.position = new BABYLON.Vector3((-(scene.pointerX-screen.width/2)/(canvas.width/screen.width))/4 + 150, 15, ((scene.pointerY-screen.height/2)/(screen.height/canvas.height))/5+20);
 				target = KAMEN.position;
-				pot = Path(3,curve);
+				pot = Path(3.6,curve);
 				
 				ribbon = BABYLON.Mesh.CreateRibbon("ribbon", pot, false, false, 0, scene);
 				ribbon.material = ribbonMaterial;
@@ -413,7 +490,6 @@
 					KAMNIMODRI[stKamnov] = KAMENBLUE.clone();
 					KAMNIMODRI[stKamnov].isVisible = true;
 					KAMNIMODRI[stKamnov].position = new BABYLON.Vector3(0,1.32,0);
-					console.log("x")
 					KAMNIMODRI[stKamnov].setPhysicsState({impostor:BABYLON.PhysicsEngine.CylinderImpostor, move:true, mass:mass, friction:ktr, restitution:odbojnost});
 					camera2.target = KAMNIMODRI[stKamnov];
 					items.push(KAMNIMODRI[stKamnov]);
@@ -430,7 +506,7 @@
 				}
 				var pot = [];
 				curve = 0;
-				pot = Path(3,curve);
+				pot = Path(3.6,curve);
 				ribbon = BABYLON.Mesh.CreateRibbon("ribbon", pot, false, false, 0, scene);
 				ribbon.material = ribbonMaterial;
 			}
@@ -451,12 +527,11 @@
 		// animacije
 		var alpha = 0;
 		var pozicije = [];
-		pozicije[0] = 200;
-		
+		pozicije[0] = 100;
 		scene.registerBeforeRender(function () {
-			if(alpha == 20)
+			if(alpha == 200)
 				alpha = 0;
-			if (faza == 2 && alpha == 1){
+			if (faza == 2 && alpha%20 == 0){
 				pozicije1 = getPositions();
 				if(soPrimiru(pozicije, pozicije1)){
 					skybox.isVisible = false;
@@ -478,8 +553,8 @@
 					metla.isVisible = false;
 					}
 						
-				metla.position.x = curr.position.x + 10;
-                metla.position.z = curr.position.z + Math.sin(alpha/2)*2;
+				metla.position.x = curr.position.x + 10; 	
+                metla.position.z = curr.position.z + Math.sin(alpha/4)*2;
 			
 			}
 			
@@ -511,10 +586,24 @@
 					scene.activeCamera = camera1;
 					stKamnov = stKamnov + 1;
 					stKamnovPoteza = 0;
+					if(stKamnov == 1){
+						poisciZmagovalca();
+						/*stKamnov = 0;
+						pocistiPredmete(KAMNIMODRI);
+						pocistiPredmete(KAMNIRDEČI);
+						pocistiPredmete(items);
+						*/
+					}
 				}
 			
 			}
-			
+			if (faza == 1.1){
+				powerselect.position.z = powerbar.position.z +Math.sin(Math.PI*alpha/50)*6
+			}
+			if (faza == 4){
+				
+				zmagovalec.rotation.y = Math.sin(Math.PI*alpha);
+			}
 			
 
 			alpha ++;

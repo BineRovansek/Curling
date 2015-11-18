@@ -1,5 +1,5 @@
 {"autoClear":true,"clearColor":[0,0,0],"ambientColor":[0.2,0.2,0.3],"gravity":[0,-9.81,0],
-"materials":[{"name":"curlingstonered.kamenBaked","id":"curlingstonered.kamenBaked","ambient":[1,1,1],"diffuse":[1,1,1],"specular":[0.5,0.5,0.5],"emissive":[0.2,0.2,0.2],"specularPower":50,"alpha":1,"backFaceCulling":true,"checkReadyOnlyOnce":true, 
+"materials":[{"name":"curlingstonered.kamenBaked","id":"curlingstonered.kamenBaked","ambient":[1,1,1],"diffuse":[2,2,2],"specular":[0.5,0.5,0.5],"emissive":[0.2,0.2,0.2],"specularPower":50,"alpha":1,"backFaceCulling":true,"checkReadyOnlyOnce":true, 
 "diffuseTexture":{"name":"KamenRdečBaked.png","level":1,"hasAlpha":1,"coordinatesMode":1,"uOffset":0,"vOffset":0,"uScale":1,"vScale":1,"uAng":0,"vAng":0,"wAng":0,"wrapU":1,"wrapV":1,"coordinatesIndex":0}}],
 "multiMaterials":[],
 "skeletons":[],

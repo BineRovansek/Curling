@@ -1,5 +1,5 @@
 {"autoClear":true,"clearColor":[0,0,0],"ambientColor":[0.2,0.2,0.3],"gravity":[0,-9.81,0],
-"materials":[{"name":"curlingstoneblue.Material","id":"curlingstoneblue.Material","ambient":[0.8,0.8,0.8],"diffuse":[0.64,0.64,0.64],"specular":[0.5,0.5,0.5],"emissive":[0,0,0],"specularPower":50,"alpha":1,"backFaceCulling":true,"checkReadyOnlyOnce":true, 
+"materials":[{"name":"curlingstoneblue.Material","id":"curlingstoneblue.Material","ambient":[1.5,1.5,1.5],"diffuse":[2,2,2],"specular":[0.5,0.5,0.5],"emissive":[0,0,0],"specularPower":50,"alpha":1,"backFaceCulling":true,"checkReadyOnlyOnce":true, 
 "diffuseTexture":{"name":"KamenModerBaked.jpg","level":1,"hasAlpha":1,"coordinatesMode":0,"uOffset":0,"vOffset":0,"uScale":1,"vScale":1,"uAng":0,"vAng":0,"wAng":0,"wrapU":1,"wrapV":1,"coordinatesIndex":0}}],
 "multiMaterials":[],
 "skeletons":[],
@@ -13,6 +13,6 @@
 ,"instances":[]}
 ],
 "cameras":[],
-"lights":[{"name":"Sun","id":"Sun","type":1,"position":[1.3967,6.4413,1.6681],"direction":[0,-1,0],"intensity":1,"diffuse":[1,1,1],"specular":[1,1,1]}],
+"lights":[{"name":"Sun","id":"Sun","type":1,"position":[1.3967,6.4413,1.6681],"direction":[0,-1,0],"intensity":5,"diffuse":[1,1,1],"specular":[1,1,1]}],
 "shadowGenerators":[]
 }
